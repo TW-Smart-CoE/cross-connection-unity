@@ -1,0 +1,4 @@
+[submodule "Assets/Plugins/CConn"]
+	path = Assets/Plugins/CConn
+	url = git@github.com:TW-Smart-CoE/cross-connection-csharp.git
+	branch = main
