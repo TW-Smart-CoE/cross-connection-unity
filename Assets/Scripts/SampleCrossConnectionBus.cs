@@ -1,10 +1,5 @@
 using CConn;
 
-public struct Msg
-{
-    public int value;
-}
-
 public class SampleCrossConnectionBus : SceneSingleton<SampleCrossConnectionBus>
 {
     private const uint DETECT_FLAG = 0xfffe1234;

@@ -24,13 +24,10 @@ cross-connection is used to provide a cross-protocol pub/sub-mode connection lib
 
 ### Sample Bus (Server)
 
+Assets/Scenes/CrossConnectionBusScene
+
 ``` csharp
 using CConn;
-
-public struct Msg
-{
-    public int value;
-}
 
 public class SampleCrossConnectionBus : SceneSingleton<SampleCrossConnectionBus>
 {
@@ -75,6 +72,8 @@ public class SampleCrossConnectionBus : SceneSingleton<SampleCrossConnectionBus>
 
 
 ### Sample Client
+
+Assets/Scenes/TcpClientScene 
 
 ``` csharp
 using System;
