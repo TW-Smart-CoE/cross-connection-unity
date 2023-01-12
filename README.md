@@ -123,7 +123,7 @@ public class SampleTcpClient : SceneSingleton<SampleTcpClient>
         connection.ConnectionStateChanged -= OnConnectionStateChanged;
     }
 
-    void Start()
+    private void Start()
     {
         detector.StartDiscover(
             ConfigProps.create()
