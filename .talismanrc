@@ -1,0 +1,4 @@
+fileignoreconfig:
+- filename: Assets/Plugins/CConn
+  checksum: 6a118db0f25ae17d6ae089c278b0c0c1328b47ef2207485872ae3dd343705180
+version: "1.0"
