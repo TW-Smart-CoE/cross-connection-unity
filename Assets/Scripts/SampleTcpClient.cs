@@ -48,27 +48,33 @@ public class SampleTcpClient : SceneSingleton<SampleTcpClient>
     private void Start()
     {
         detector.StartDiscover(
-            ConfigProps.create()
-                .Put(PropKeys.PROP_FLAG, DETECT_FLAG),
+            ConfigProps.Create()
+                .Put(PropKeys.PROP_FLAG, DETECT_FLAG)
+                .Put(PropKeys.PROP_BROADCAST_DEBUG_MODE, true),
             (props) =>
             {
                 detector.StopDiscover();
 
                 var ip = props.Get(PropKeys.PROP_SERVER_IP, "");
                 var port = props.Get(PropKeys.PROP_SERVER_PORT, 0);
-
                 LogManager.Instance.Info($"Found {ip} {port}");
 
                 if (ip != "" && port != 0)
                 {
                     connection.Start(
-                        ConfigProps.create()
+                        ConfigProps.Create()
                             .Put(PropKeys.PROP_IP, ip)
                             .Put(PropKeys.PROP_PORT, port)
                             .Put(PropKeys.PROP_AUTO_RECONNECT, true)
                             .Put(PropKeys.PROP_MAX_RECONNECT_RETRY_TIME, 8)
                             .Put(PropKeys.PROP_RECV_BUFFER_SIZE, 8192)
                     );
+                }
+
+                var data = props.GetBytes(PropKeys.PROP_BROADCAST_DATA, null);
+                if (data != null)
+                {
+                    LogManager.Instance.Info($"Broadcast data: {DataConverter.BytesToString(data)}");
                 }
             } 
         );
@@ -84,7 +90,7 @@ public class SampleTcpClient : SceneSingleton<SampleTcpClient>
                     TEST_TOPIC,
                     Method.REQUEST,
                     DataConverter.StringToBytes($"data {count++}")
-                    );
+                );
             }
         }
     }

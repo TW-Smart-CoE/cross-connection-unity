@@ -3,8 +3,8 @@ using CConn;
 public class SampleCrossConnectionBus : SceneSingleton<SampleCrossConnectionBus>
 {
     private const uint DETECT_FLAG = 0xfffe1234;
-    private IBus bus = ConnectionFactory.CreateBus();
-    private int count = 0;
+    private readonly IBus bus = ConnectionFactory.CreateBus();
+    private readonly int count = 0;
 
     private void OnDestroy() {
         bus.StopAll();
@@ -24,14 +24,16 @@ public class SampleCrossConnectionBus : SceneSingleton<SampleCrossConnectionBus>
     {
         if (!bus.Start(
             ConnectionType.TCP,
-            ConfigProps.create()
+            ConfigProps.Create()
                 .Put(PropKeys.PROP_PORT, 11001)
                 .Put(PropKeys.PROP_RECV_BUFFER_SIZE, 8192),
-            ConfigProps.create()
+            ConfigProps.Create()
                 .Put(PropKeys.PROP_FLAG, DETECT_FLAG)
                 .Put(PropKeys.PROP_SERVER_PORT, 11001)
                 .Put(PropKeys.PROP_BROADCAST_PORT, 12000)
                 .Put(PropKeys.PROP_BROADCAST_INTERVAL, 3000)
+                .Put(PropKeys.PROP_BROADCAST_DATA, DataConverter.StringToBytes("hello data"))
+                .Put(PropKeys.PROP_BROADCAST_DEBUG_MODE, true)
         ))
         {
             LogManager.Instance.Error("Start bus failed");

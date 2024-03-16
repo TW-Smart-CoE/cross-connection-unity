@@ -27,13 +27,14 @@ cross-connection is used to provide a cross-protocol pub/sub-mode connection lib
 Assets/Scenes/CrossConnectionBusScene
 
 ``` csharp
+
 using CConn;
 
 public class SampleCrossConnectionBus : SceneSingleton<SampleCrossConnectionBus>
 {
     private const uint DETECT_FLAG = 0xfffe1234;
-    private IBus bus = ConnectionFactory.CreateBus();
-    private int count = 0;
+    private readonly IBus bus = ConnectionFactory.CreateBus();
+    private readonly int count = 0;
 
     private void OnDestroy() {
         bus.StopAll();
@@ -53,14 +54,16 @@ public class SampleCrossConnectionBus : SceneSingleton<SampleCrossConnectionBus>
     {
         if (!bus.Start(
             ConnectionType.TCP,
-            ConfigProps.create()
+            ConfigProps.Create()
                 .Put(PropKeys.PROP_PORT, 11001)
                 .Put(PropKeys.PROP_RECV_BUFFER_SIZE, 8192),
-            ConfigProps.create()
+            ConfigProps.Create()
                 .Put(PropKeys.PROP_FLAG, DETECT_FLAG)
                 .Put(PropKeys.PROP_SERVER_PORT, 11001)
                 .Put(PropKeys.PROP_BROADCAST_PORT, 12000)
                 .Put(PropKeys.PROP_BROADCAST_INTERVAL, 3000)
+                .Put(PropKeys.PROP_BROADCAST_DATA, DataConverter.StringToBytes("hello data"))
+                .Put(PropKeys.PROP_BROADCAST_DEBUG_MODE, true)
         ))
         {
             LogManager.Instance.Error("Start bus failed");
@@ -76,6 +79,7 @@ public class SampleCrossConnectionBus : SceneSingleton<SampleCrossConnectionBus>
 Assets/Scenes/TcpClientScene 
 
 ``` csharp
+
 using System;
 using UnityEngine;
 using CConn;
@@ -126,27 +130,33 @@ public class SampleTcpClient : SceneSingleton<SampleTcpClient>
     private void Start()
     {
         detector.StartDiscover(
-            ConfigProps.create()
-                .Put(PropKeys.PROP_FLAG, DETECT_FLAG),
+            ConfigProps.Create()
+                .Put(PropKeys.PROP_FLAG, DETECT_FLAG)
+                .Put(PropKeys.PROP_BROADCAST_DEBUG_MODE, true),
             (props) =>
             {
                 detector.StopDiscover();
 
                 var ip = props.Get(PropKeys.PROP_SERVER_IP, "");
                 var port = props.Get(PropKeys.PROP_SERVER_PORT, 0);
-
                 LogManager.Instance.Info($"Found {ip} {port}");
 
                 if (ip != "" && port != 0)
                 {
                     connection.Start(
-                        ConfigProps.create()
+                        ConfigProps.Create()
                             .Put(PropKeys.PROP_IP, ip)
                             .Put(PropKeys.PROP_PORT, port)
                             .Put(PropKeys.PROP_AUTO_RECONNECT, true)
                             .Put(PropKeys.PROP_MAX_RECONNECT_RETRY_TIME, 8)
                             .Put(PropKeys.PROP_RECV_BUFFER_SIZE, 8192)
                     );
+                }
+
+                var data = props.GetBytes(PropKeys.PROP_BROADCAST_DATA, null);
+                if (data != null)
+                {
+                    LogManager.Instance.Info($"Broadcast data: {DataConverter.BytesToString(data)}");
                 }
             } 
         );
@@ -162,7 +172,7 @@ public class SampleTcpClient : SceneSingleton<SampleTcpClient>
                     TEST_TOPIC,
                     Method.REQUEST,
                     DataConverter.StringToBytes($"data {count++}")
-                    );
+                );
             }
         }
     }
