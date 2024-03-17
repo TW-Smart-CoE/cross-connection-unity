@@ -1,4 +1,5 @@
 using CConn;
+using UnityEngine;
 
 public class SampleCrossConnectionBus : SceneSingleton<SampleCrossConnectionBus>
 {
@@ -8,6 +9,7 @@ public class SampleCrossConnectionBus : SceneSingleton<SampleCrossConnectionBus>
 
     private void OnDestroy() {
         bus.StopAll();
+        bus.Cleanup();
     }
 
     protected override void Awake() {
@@ -37,6 +39,23 @@ public class SampleCrossConnectionBus : SceneSingleton<SampleCrossConnectionBus>
         ))
         {
             LogManager.Instance.Error("Start bus failed");
+        }
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            bus.ResetRegister(
+                ConnectionType.TCP,
+                ConfigProps.Create()
+                    .Put(PropKeys.PROP_FLAG, DETECT_FLAG)
+                    .Put(PropKeys.PROP_SERVER_PORT, 11001)
+                    .Put(PropKeys.PROP_BROADCAST_PORT, 12000)
+                    .Put(PropKeys.PROP_BROADCAST_INTERVAL, 3000)
+                    .Put(PropKeys.PROP_BROADCAST_DATA, DataConverter.StringToBytes("hello data next"))
+                    .Put(PropKeys.PROP_BROADCAST_DEBUG_MODE, true)
+            );
         }
     }
 }
